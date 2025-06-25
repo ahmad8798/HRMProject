@@ -15,8 +15,11 @@ public class OfficeLocation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false,nullable = false)
     private Integer locationId;
+    @Column(unique = true, nullable = false)
     private String city;
+    @Column( nullable = false)
     private String state;
+    @Column( nullable = false)
     private String countryCode;
 }
 
