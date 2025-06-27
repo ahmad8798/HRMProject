@@ -12,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/admin/office-locations")
@@ -27,6 +27,27 @@ public class OfficeLocationController {
     public OfficeLocationController(OfficeLocationService officeLocationService) {
         this.officeLocationService = officeLocationService;
     }
+
+    @GetMapping()
+    public ResponseEntity<?> getAllOfficeLocations(){
+        List<OfficeLocation> officeLocations = officeLocationService.getAllOfficeLocations();
+
+        if(officeLocations.isEmpty()){
+            return new ResponseEntity<>(ApiResponse.error("No office locations found"), HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(ApiResponse.success("Office locations retrieved successfully", officeLocations), HttpStatus.OK);
+    }
+
+    @GetMapping("{locationId}")
+    public ResponseEntity<?> getOfficeLocationById(@PathVariable Integer locationId){
+        OfficeLocation officeLocation = officeLocationService.getOfficeLocationById(locationId);
+        if(officeLocation == null){
+            return new ResponseEntity<>(ApiResponse.error("Office location with id "+locationId+" is not found"), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(ApiResponse.success("Office location retrieved successfully", officeLocation), HttpStatus.OK);
+    }
+
 
     @PostMapping()
     public ResponseEntity<?> createOfficeLocation(@RequestBody @Validated(ValidationSequence.class) OfficeLocationRequestDTO newOfficeLocation) {

@@ -6,6 +6,8 @@ import com.HRM_Project.HRM_Project.repository.OfficeLocationDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class OfficeLocationService {
@@ -23,6 +25,14 @@ public class OfficeLocationService {
         officeLocation.setState(newOfficeLocation.getState());
         officeLocation.setCountryCode(newOfficeLocation.getCountryCode());
         return officeLocationDao.save(officeLocation);
+    }
+
+    public List<OfficeLocation> getAllOfficeLocations(){
+        return officeLocationDao.findAll();
+    }
+
+    public OfficeLocation getOfficeLocationById(Integer locationId){
+        return officeLocationDao.findById(locationId).orElse(null);
     }
 
 }
