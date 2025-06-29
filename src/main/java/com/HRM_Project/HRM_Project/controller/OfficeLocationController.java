@@ -30,8 +30,7 @@ public class OfficeLocationController {
 
     @GetMapping()
     public ResponseEntity<?> getAllOfficeLocations(){
-        List<OfficeLocation> officeLocations = officeLocationService.getAllOfficeLocations();
-
+        List<OfficeLocationResponseDTO> officeLocations = officeLocationService.getAllOfficeLocations();
         if(officeLocations.isEmpty()){
             return new ResponseEntity<>(ApiResponse.error("No office locations found"), HttpStatus.NOT_FOUND);
         }
@@ -41,30 +40,21 @@ public class OfficeLocationController {
 
     @GetMapping("{locationId}")
     public ResponseEntity<?> getOfficeLocationById(@PathVariable Integer locationId){
-        OfficeLocation officeLocation = officeLocationService.getOfficeLocationById(locationId);
-        if(officeLocation == null){
-            return new ResponseEntity<>(ApiResponse.error("Office location with id "+locationId+" is not found"), HttpStatus.NOT_FOUND);
-        }
+        OfficeLocationResponseDTO officeLocation = officeLocationService.getOfficeLocationById(locationId);
         return new ResponseEntity<>(ApiResponse.success("Office location retrieved successfully", officeLocation), HttpStatus.OK);
     }
 
 
     @PostMapping()
-    public ResponseEntity<?> createOfficeLocation(@RequestBody @Validated(ValidationSequence.class) OfficeLocationRequestDTO newOfficeLocation) {
-        OfficeLocation officeLocation = officeLocationService.createOfficeLocation(newOfficeLocation);
-        OfficeLocationResponseDTO officeLocationResponseDTO = new OfficeLocationResponseDTO(officeLocation);
+    public ResponseEntity<?> createOfficeLocation(@RequestBody @Validated(ValidationGroups.ValidationSequence.class) OfficeLocationRequestDTO newOfficeLocation) {
+        OfficeLocationResponseDTO officeLocation = officeLocationService.createOfficeLocation(newOfficeLocation);
         ApiResponse<OfficeLocationResponseDTO> response = ApiResponse.success("Office location created successfully"
-                , officeLocationResponseDTO);
+                , officeLocation);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
-    @GroupSequence({ValidationGroups.NotEmptyCheck.class,
-            ValidationGroups.SizeCheck.class,
-            ValidationGroups.PatternCheck.class,
-            Default.class})
-    public interface ValidationSequence {
-    }
+
 
 
 }
