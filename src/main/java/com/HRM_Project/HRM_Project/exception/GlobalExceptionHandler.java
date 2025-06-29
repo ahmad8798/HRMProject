@@ -23,7 +23,17 @@ public class GlobalExceptionHandler {
     private static final Map<String,ConstraintErrorInfo> CONSTRAINT_VIOLATION_MAP;
 
     static {
-        CONSTRAINT_VIOLATION_MAP = Map.of("uk_office_location_city", new ConstraintErrorInfo("city", "A location with this city already exists."));
+        CONSTRAINT_VIOLATION_MAP = Map.of(
+                "uk_office_location_city", new ConstraintErrorInfo("city", "A location with this city already exists."),
+                "uk_employee_email", new ConstraintErrorInfo("email", "Employee with this email already exists")
+        );
+
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        ApiResponse<?> response = ApiResponse.error(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -38,6 +48,7 @@ public class GlobalExceptionHandler {
         ApiResponse<?> response = ApiResponse.validationError("Validation failed", errors);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse<?>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
@@ -79,6 +90,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleException(Exception ex) {
+        ex.printStackTrace();
         ApiResponse<?> response = ApiResponse.error("An unexpected error occurred. Please try again later.");
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
