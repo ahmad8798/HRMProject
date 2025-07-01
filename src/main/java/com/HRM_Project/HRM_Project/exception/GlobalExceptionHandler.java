@@ -1,4 +1,3 @@
-
 package com.HRM_Project.HRM_Project.exception;
 
 import com.HRM_Project.HRM_Project.dto.ApiResponse;
@@ -25,7 +24,9 @@ public class GlobalExceptionHandler {
     static {
         CONSTRAINT_VIOLATION_MAP = Map.of(
                 "uk_office_location_city", new ConstraintErrorInfo("city", "A location with this city already exists."),
-                "uk_employee_email", new ConstraintErrorInfo("email", "Employee with this email already exists")
+                "uk_employee_email", new ConstraintErrorInfo("email", "Employee with this email already exists"),
+                "uk_user_username", new ConstraintErrorInfo("username", "Employee with this username already exists"),
+                "uk_user_employee", new ConstraintErrorInfo("employee_id", "Employee with following employee_id already exists")
         );
 
     }
@@ -125,5 +126,18 @@ public class GlobalExceptionHandler {
         return Optional.empty();
     }
 
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ApiResponse<?>> handleValidationException(ValidationException ex) {
+        ApiResponse<?> response = ApiResponse.validationError(ex.getMessage(), ex.getFieldErrors());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
+    // Keep the existing IllegalArgumentException handler for other cases
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<?>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        // If it's our custom ValidationException, it should be handled by the specific handler above
+        // This handles other IllegalArgumentExceptions
+        ApiResponse<?> response = ApiResponse.error(ex.getMessage() != null ? ex.getMessage() : "Invalid argument provided");
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

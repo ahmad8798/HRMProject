@@ -1,10 +1,9 @@
 package com.HRM_Project.HRM_Project.controller;
 
-import com.HRM_Project.HRM_Project.dto.ApiResponse;
-import com.HRM_Project.HRM_Project.dto.EmployeeCreateDto;
-import com.HRM_Project.HRM_Project.dto.EmployeeResponseDto;
+import com.HRM_Project.HRM_Project.dto.*;
 import com.HRM_Project.HRM_Project.entity.Employee;
 import com.HRM_Project.HRM_Project.service.EmployeeService;
+import com.HRM_Project.HRM_Project.service.EmployeeUserOrchestrationService;
 import com.HRM_Project.HRM_Project.validation.ValidationGroups;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +16,23 @@ import java.util.List;
 @RequestMapping("api/v1/admin/employees")
 public class EmployeeController {
 
-    EmployeeService employeeService;
-
-    public EmployeeController(EmployeeService employeeService) {
+    private final EmployeeService employeeService;
+    private final EmployeeUserOrchestrationService orchestrationService;
+    public EmployeeController(EmployeeService employeeService, EmployeeUserOrchestrationService orchestrationService) {
         this.employeeService = employeeService;
+        this.orchestrationService = orchestrationService;
     }
 
-    @PostMapping()
-    public ResponseEntity<?> createEmployee(@Validated(ValidationGroups.ValidationSequence.class) @RequestBody EmployeeCreateDto employeeCreateDto){
-        EmployeeResponseDto responseDto = employeeService.createEmployee(employeeCreateDto);
-        ApiResponse<EmployeeResponseDto> response = ApiResponse.success("Employee created successfully", responseDto);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    @PostMapping
+    public ResponseEntity<ApiResponse<CreateEmployeeWithUserResponseDto>> createEmployeeWithUser(
+            @Validated(ValidationGroups.ValidationSequence.class)
+            @RequestBody CreateEmployeeWithUserRequestDto request) {
+
+        CreateEmployeeWithUserResponseDto response = orchestrationService.createEmployeeWithUser(request);
+        ApiResponse<CreateEmployeeWithUserResponseDto> apiResponse =
+                ApiResponse.success("Employee and user account created successfully", response);
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
     @GetMapping("{employeeId}")
